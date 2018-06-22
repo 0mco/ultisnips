@@ -15,6 +15,7 @@ def _calc_end(text, start):
         new_end = Position(start.line + len(text) - 1, len(text[-1]))
     return new_end
 
+
 def _replace_text(buf, start, end, text):
     """Copy the given text to the current buffer, overwriting the span 'start'
     to 'end'."""
@@ -294,10 +295,6 @@ class EditableTextObject(TextObject):
         tno_max = max(self._tabstops.keys())
 
         possible_sol = []
-        if number == tno_max:
-            # by convention the tabstop with index 0 should be the last tabstop.
-            if self._tabstops[0]._start + Position(0, 1) >= _vim.buf.cursor:
-                return (0, self._tabstops[0])
 
         i = number + 1
         while i <= tno_max:
@@ -312,6 +309,8 @@ class EditableTextObject(TextObject):
         possible_sol += child
 
         if not len(possible_sol):
+            if self._tabstops[0]._start + Position(0, 1) >= _vim.buf.cursor:
+                return (0, self._tabstops[0])
             return None
 
         return min(possible_sol)
