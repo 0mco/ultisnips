@@ -312,12 +312,14 @@ class EditableTextObject(TextObject):
         """Returns the next tabstop after 'number'."""
         if not len(self._tabstops.keys()):
             return
-        tno_max = max(self._tabstops.keys())
 
+        tno_max = max(self._tabstops.keys())
         possible_sol = []
+
         i = number + 1
         while i <= tno_max:
-            if i in self._tabstops:
+            # FIXME: fix Position(0, 1)
+            if i in self._tabstops and self._tabstops[i]._start + Position(0, 1) >= _vim.buf.cursor:
                 possible_sol.append((i, self._tabstops[i]))
                 break
             i += 1
@@ -328,6 +330,8 @@ class EditableTextObject(TextObject):
         possible_sol += child
 
         if not len(possible_sol):
+            if self._tabstops[0]._start + Position(0, 1) >= _vim.buf.cursor:
+                return (0, self._tabstops[0])
             return None
 
         return min(possible_sol)

@@ -120,24 +120,14 @@ class SnippetInstance(EditableTextObject):
         elif jump_direction == JumpDirection.FORWARD:
             res = self._get_next_tab(self._cts)
             if res is None:
-                self._cts = None
-
-                ts = self._get_tabstop(self, 0)
-                if ts:
-                    return ts
-
-                # TabStop 0 was deleted. It was probably killed through some
-                # edit action. Recreate it at the end of us.
-                start = Position(self.end.line, self.end.col)
-                end = Position(self.end.line, self.end.col)
-                return TabStop(self, 0, start, end)
+                return
             else:
                 self._cts, ts = res
+                if self._cts == 0:
+                    self._cts = None
                 return ts
         else:
             assert False, "Unknown JumpDirection: %r" % jump_direction
-
-        return self._tabstops[self._cts]
 
     def _get_tabstop(self, requester, no):
         # SnippetInstances are completely self contained, therefore, we do not
