@@ -108,6 +108,15 @@ class SnippetDefinition:
         self._context = None
         self._actions = actions or {}
 
+        rv = {}
+        code = r"""def get_locals():
+    import re, os, vim, string, random
+    exec(r'''{}''')
+    return locals()
+rv = get_locals()""".format(''.join(self._globals.get('!p', [])).strip())
+        exec(code, {}, rv)
+        self._locals = rv['rv']
+
         # Make sure that we actually match our trigger in case we are
         # immediately expanded.
         self.matches(self._trigger)
@@ -156,13 +165,11 @@ class SnippetDefinition:
         return self._eval_code("snip.context = " + self._context_code, locals).context
 
     def _eval_code(self, code, additional_locals={}):
-        code = "\n".join(
-            [
-                "import re, os, vim, string, random",
-                "\n".join(self._globals.get("!p", [])).replace("\r\n", "\n"),
-                code,
-            ]
-        )
+        # code = "\n".join([
+        #     'import re, os, vim, string, random',
+        #     '\n'.join(self._globals.get('!p', [])).replace('\r\n', '\n'),
+        #     code
+        # ])
 
         current = vim.current
 
@@ -179,7 +186,7 @@ class SnippetDefinition:
         snip = SnippetUtilForAction(locals)
 
         try:
-            exec(code, {"snip": snip})
+            exec(code, {'snip': snip, 't': additional_locals['t'], 's': additional_locals['s']}, self._locals)
         except Exception as e:
             self._make_debug_exception(e, code)
             raise
@@ -401,11 +408,15 @@ class SnippetDefinition:
             return False
 
     def do_post_expand(self, start, end, snippets_stack):
-        if "post_expand" in self._actions:
+        if 'post_expand' in self._actions:
+            _tabs = snippets_stack[-1].get_tabstops()
+            t = [_tabs[k].current_text for k in sorted(_tabs)]
             locals = {
-                "snippet_start": start,
-                "snippet_end": end,
-                "buffer": vim_helper.buf,
+                'snippet_start': start,
+                'snippet_end': end,
+                'buffer': _vim.buf,
+                't': t,
+                's': snippets_stack[-1]
             }
 
             snip = self._execute_action(

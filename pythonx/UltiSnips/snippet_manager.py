@@ -527,6 +527,8 @@ class SnippetManager:
 
     def _current_snippet_is_done(self):
         """The current snippet should be terminated."""
+        post_snip = self._current_snippet
+        post_snip.snippet.do_post_expand(1, 1, [post_snip])
         self._active_snippets.pop()
         if not self._active_snippets:
             self._teardown_inner_state()
@@ -762,13 +764,11 @@ class SnippetManager:
             self._visual_content.reset()
             self._active_snippets.append(snippet_instance)
 
-            with use_proxy_buffer(self._active_snippets, self._vstate):
-                with self._action_context():
-                    snippet.do_post_expand(
-                        snippet_instance.start,
-                        snippet_instance.end,
-                        self._active_snippets,
-                    )
+            # with use_proxy_buffer(self._active_snippets, self._vstate):
+            #     with self._action_context():
+            #         snippet.do_post_expand(
+            #             snippet_instance._start, snippet_instance._end, self._active_snippets
+            #         )
 
             self._vstate.remember_buffer(self._active_snippets[0])
 
