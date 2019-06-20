@@ -726,9 +726,14 @@ class SnippetManager:
             text_before = before[: -len(snippet.matched)]
 
         with use_proxy_buffer(self._active_snippets, self._vstate):
+            start = Position(_vim.buf.cursor.line, len(text_before))
+            end = Position(_vim.buf.cursor.line, len(before))
             with self._action_context():
                 cursor_set_in_action = snippet.do_pre_expand(
-                    self._visual_content.text, self._active_snippets
+                    self._visual_content.text,
+                    start,
+                    end,
+                    self._active_snippets
                 )
 
         if cursor_set_in_action:

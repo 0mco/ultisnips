@@ -395,9 +395,13 @@ rv = get_locals()""".format(''.join(self._globals.get('!p', [])).strip())
         objects alive inside of Vim."""
         raise NotImplementedError()
 
-    def do_pre_expand(self, visual_content, snippets_stack):
-        if "pre_expand" in self._actions:
-            locals = {"buffer": vim_helper.buf, "visual_content": visual_content}
+    def do_pre_expand(self, visual_content, start, end, snippets_stack):
+        if 'pre_expand' in self._actions:
+            locals = {'buffer': _vim.buf, 'visual_content': visual_content,
+                    't': None,
+                    's': None,
+                    'snippet_start': start,
+                    'snippet_end': end}
 
             snip = self._execute_action(
                 self._actions["pre_expand"], self._context, locals
