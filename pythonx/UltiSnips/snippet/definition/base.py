@@ -15,6 +15,8 @@ from UltiSnips.text_objects import SnippetInstance
 from UltiSnips.position import Position
 from UltiSnips.text_objects.python_code import SnippetUtilForAction
 
+from UltiSnips.debug import debug as dump_msg
+
 __WHITESPACE_SPLIT = re.compile(r"\s")
 
 
@@ -413,6 +415,7 @@ rv = get_locals()""".format(''.join(self._globals.get('!p', [])).strip())
 
     def do_post_expand(self, start, end, snippets_stack):
         if 'post_expand' in self._actions:
+            dump_msg("post_expand" + str(self))
             _tabs = snippets_stack[-1].get_tabstops()
             t = [_tabs[k].current_text for k in sorted(_tabs)]
             locals = {
@@ -432,6 +435,23 @@ rv = get_locals()""".format(''.join(self._globals.get('!p', [])).strip())
             return snip.cursor.is_set()
         else:
             return False
+
+    def do_done_expand(self, start, end, snippets_stack):
+        if 'done_expand' in self._actions:
+            dump_msg("done_expand" + str(self))
+            _tabs = snippets_stack[-1].get_tabstops()
+            t = [_tabs[k].current_text for k in sorted(_tabs)]
+            locals = {
+                'snippet_start': start,
+                'snippet_end': end,
+                'buffer': _vim.buf,
+                't': t,
+                's': None
+            }
+
+            snip = self._execute_action(
+                self._actions['done_expand'], None, locals
+            )
 
     def do_post_jump(
         self, tabstop_number, jump_direction, snippets_stack, current_snippet
