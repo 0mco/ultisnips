@@ -399,7 +399,7 @@ rv = get_locals()""".format(''.join(self._globals.get('!p', [])).strip())
 
     def do_pre_expand(self, visual_content, start, end, snippets_stack):
         if 'pre_expand' in self._actions:
-            locals = {'buffer': _vim.buf, 'visual_content': visual_content,
+            locals = {'buffer': vim_helper.buf, 'visual_content': visual_content,
                     't': None,
                     's': None,
                     'snippet_start': start,
@@ -421,7 +421,7 @@ rv = get_locals()""".format(''.join(self._globals.get('!p', [])).strip())
             locals = {
                 'snippet_start': start,
                 'snippet_end': end,
-                'buffer': _vim.buf,
+                'buffer': vim_helper.buf,
                 't': t,
                 's': snippets_stack[-1]
             }
@@ -444,7 +444,7 @@ rv = get_locals()""".format(''.join(self._globals.get('!p', [])).strip())
             locals = {
                 'snippet_start': start,
                 'snippet_end': end,
-                'buffer': _vim.buf,
+                'buffer': vim_helper.buf,
                 't': t,
                 's': None
             }

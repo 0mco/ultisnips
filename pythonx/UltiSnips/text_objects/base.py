@@ -319,7 +319,7 @@ class EditableTextObject(TextObject):
         i = number + 1
         while i <= tno_max:
             # FIXME: fix Position(0, 1)
-            if i in self._tabstops and self._tabstops[i]._start + Position(0, 1) >= _vim.buf.cursor:
+            if i in self._tabstops and self._tabstops[i]._start + Position(0, 1) >= vim_helper.buf.cursor:
                 possible_sol.append((i, self._tabstops[i]))
                 break
             i += 1
@@ -330,7 +330,7 @@ class EditableTextObject(TextObject):
         possible_sol += child
 
         if not len(possible_sol):
-            if self._tabstops[0]._start + Position(0, 1) >= _vim.buf.cursor:
+            if self._tabstops[0]._start + Position(0, 1) >= vim_helper.buf.cursor:
                 return (0, self._tabstops[0])
             return None
 
